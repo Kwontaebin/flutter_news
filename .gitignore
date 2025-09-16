@@ -1,0 +1,49 @@
+# Flutter/Dart/Pub 관련
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+
+# 빌드 결과물
+build/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/App.framework
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Android 빌드 결과물
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+
+# iOS 관련 (Xcode 빌드 결과물)
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/App.framework
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+
+# macOS 관련
+**/macos/Flutter/ephemeral/
+
+# Web 빌드 산출물
+web/.dart_tool/
+web/build/
+
+# VS Code / IntelliJ / Android Studio 설정
+.vscode/
+.idea/
+*.iml
+
+# 기타
+*.log
+*.lock
