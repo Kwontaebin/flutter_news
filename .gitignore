@@ -47,3 +47,5 @@ web/build/
 # 기타
 *.log
 *.lock
+
+.env
