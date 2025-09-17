@@ -4,7 +4,6 @@ import 'package:flutter_news/component/navigator.dart';
 import 'package:flutter_news/news/newsScreen.dart';
 
 class ScaffoldComponent extends StatefulWidget {
-
   const ScaffoldComponent({super.key});
 
   @override
@@ -14,10 +13,7 @@ class ScaffoldComponent extends StatefulWidget {
 class _ScaffoldComponentState extends State<ScaffoldComponent> {
   int _selectedIndex = 0; // 현재 선택된 탭 인덱스
 
-  final List _screens = [
-    const NewsScreen(),
-    const BookmarkScreen()
-  ];
+  final List _screens = [const NewsScreen(), const BookmarkScreen()];
 
   void _onItemTapped(int index) {
     setState(() {

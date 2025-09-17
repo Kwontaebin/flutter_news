@@ -1,32 +1,30 @@
 import 'package:dio/dio.dart';
 
-enum HttpMethod {
-  get,
-  post,
-  put,
-  delete
-}
+enum HttpMethod { GET, POST, PUT, DELETE }
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://newsapi.org/v2/everything',
+    baseUrl: 'https://newsapi.org/v2',
     headers: {'Content-Type': 'application/json'},
   ));
 
   Future<Response> request({
     required String endpoint,
-    required String method,
+    required HttpMethod method,
     Map<String, dynamic>? queryParams,
     Map<String, dynamic>? data,
   }) async {
     try {
-      final response = await _dio.request(
-        endpoint,
-        data: (method == 'POST' || method == 'PUT') ? data : null,
-        queryParameters: (method == 'GET' || method == 'DELETE') ? queryParams : null,
-        options: Options(method: method),
-      );
-      return response;
+      switch (method) {
+        case HttpMethod.GET:
+          return await _dio.get(endpoint, queryParameters: queryParams);
+        case HttpMethod.POST:
+          return await _dio.post(endpoint, data: data);
+        case HttpMethod.PUT:
+          return await _dio.put(endpoint, data: data);
+        case HttpMethod.DELETE:
+          return await _dio.delete(endpoint, queryParameters: queryParams);
+      }
     } catch (e) {
       rethrow;
     }
