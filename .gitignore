@@ -49,3 +49,5 @@ web/build/
 *.lock
 
 .env
+macos/Flutter/GeneratedPluginRegistrant.swift
+.flutter-plugins-dependencies

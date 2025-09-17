@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_news/component/flutterToast.dart';
+import 'package:flutter_news/news/webViewScreen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../component/api/dio.dart';
@@ -20,7 +21,7 @@ class _NewsScreenState extends State<NewsScreen> {
   late final startDate = endDate.subtract(const Duration(days: 3));
   String _selectedKeyword = "경제";
   late final newsApiKey = dotenv.env['NEWS_API_KEY'];
-  final List<String> labels = ['경제', '엔터', '스포츠', '쇼핑', '여행', '개발', '지식', '건강'];
+  final List<String> labels = ['경제', '엔터', '스포츠', '쇼핑', '여행', 'IT', '지식', '건강'];
   List<Map<String, dynamic>> newsList = [];
   bool isLoading = true;
 
@@ -155,14 +156,23 @@ class _NewsScreenState extends State<NewsScreen> {
                       itemCount: newsList.length,
                       itemBuilder: (context, index) {
                         final title = newsList[index]['title'];
+                        final url = newsList[index]['url'];
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
                           child: Column(
                             children: [
                               TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (url != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => WebViewScreen(url: url)),
+                                    );
+                                  }
+                                },
                                 style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero, // 기본 패딩 제거
+                                  foregroundColor: Colors.black,
+                                  padding: EdgeInsets.zero,
                                 ),
                                 child: Text(
                                   title,
