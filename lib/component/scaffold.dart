@@ -28,6 +28,7 @@ class _ScaffoldComponentState extends State<ScaffoldComponent> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: Colors.white,
