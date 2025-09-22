@@ -35,6 +35,7 @@ class _ScaffoldComponentState extends State<ScaffoldComponent> {
         ),
         body: _screens[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.white,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           selectedItemColor: Colors.blue,
