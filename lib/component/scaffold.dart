@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_news/bookmark/bookmarkScreen.dart';
-import 'package:flutter_news/component/navigator.dart';
 import 'package:flutter_news/news/newsScreen.dart';
 
 class ScaffoldComponent extends StatefulWidget {
@@ -14,6 +13,7 @@ class _ScaffoldComponentState extends State<ScaffoldComponent> {
   int _selectedIndex = 0; // 현재 선택된 탭 인덱스
 
   final List _screens = [const NewsScreen(), const BookmarkScreen()];
+  final List<String> _titles = ["", "북마크"]; // 탭별 title
 
   void _onItemTapped(int index) {
     setState(() {
@@ -32,6 +32,11 @@ class _ScaffoldComponentState extends State<ScaffoldComponent> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: Colors.white,
+          title: Text(
+            _titles[_selectedIndex],
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.black),
+          ),
         ),
         body: _screens[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(

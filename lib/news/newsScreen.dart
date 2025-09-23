@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_news/component/flutterToast.dart';
-import 'package:flutter_news/news/webViewScreen.dart';
+import 'package:flutter_news/component/utils/webViewScreen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import '../component/api/dio.dart';
+import '../component/utils/bookmarkManager.dart';
+import '../component/utils/shareManager.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -121,7 +124,6 @@ class _NewsScreenState extends State<NewsScreen> {
     }
   }
 
-
   @override
   void dispose() {
     _searchTextController.dispose();
@@ -215,58 +217,90 @@ class _NewsScreenState extends State<NewsScreen> {
 
   Widget _buildNewsList() {
     if (newsList.isEmpty) {
-      // 기사가 아예 없으면 중앙 메시지
       return Center(child: CircularProgressIndicator());
     }
 
     return Padding(
       padding: EdgeInsets.only(top: 20.h),
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: newsList.length + (isLoading ? 1 : 0), // 마지막에 로딩 인디케이터 추가
-        itemBuilder: (context, index) {
-          if (index < newsList.length) {
-            final title = newsList[index]['title'];
-            final url = newsList[index]['url'];
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.h),
-              child: Column(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      if (url != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => WebViewScreen(url: url)),
+      child: SlidableAutoCloseBehavior(
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: newsList.length + (isLoading ? 1 : 0), // 마지막에 로딩 인디케이터 추가
+          itemBuilder: (context, index) {
+            if (index < newsList.length) {
+              final title = newsList[index]['title'];
+              final url = newsList[index]['url'];
+
+              final bookmarkManager = BookmarkManager(boxName: 'newsBox');
+              return Slidable(
+                key: ValueKey(index),
+        
+                endActionPane: ActionPane(
+                  motion: const DrawerMotion(),
+                  children: [
+                    SlidableAction(
+                      onPressed: (context) {
+                        shareContent(
+                          "공유",
+                          subject: url,
                         );
-                      }
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      padding: EdgeInsets.zero,
+                      },
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      icon: Icons.share,
+                      label: '공유',
                     ),
-                    child: Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                        height: 1.0,
+
+                    SlidableAction(
+                      onPressed: (context) {
+                        bookmarkManager.addBookmark({"title": title, "url": url});
+                      },
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      icon: Icons.bookmark,
+                      label: '북마크',
+                    ),
+                  ],
+                ),
+        
+                child: Column(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        if (url != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => WebViewScreen(url: url)),
+                          );
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          height: 1.0,
+                        ),
                       ),
                     ),
-                  ),
-                  Divider(height: 1, color: Colors.grey),
-                ],
-              ),
-            );
-          } else {
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.h),
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }
-        },
+                    Divider(height: 1, color: Colors.grey),
+                  ],
+                ),
+              );
+            } else {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+                child: Center(child: CircularProgressIndicator()),
+              ); // 20개의 데이터를 다시 가져올 때 로딩이 되어서 데이터를 가져오는 것을 알리기 위해 선언
+            }
+          },
+        ),
       ),
     );
   }
