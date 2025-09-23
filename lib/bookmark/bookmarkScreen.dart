@@ -18,11 +18,12 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   @override
   Widget build(BuildContext context) {
     final bookmarkNews = bookmarkManager.getBookmarks();
+    final theme = Theme.of(context);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.w),
       child: SlidableAutoCloseBehavior(
-        child: ListView.builder(
+        child: bookmarkNews.isNotEmpty ? ListView.builder(
           itemCount: bookmarkNews.length,
           itemBuilder: (context, index) {
             String? title = bookmarkNews[index]["title"];
@@ -35,14 +36,11 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                 children: [
                   SlidableAction(
                     onPressed: (context) {
-                      shareContent(
-                        url!,
-                        subject: title,
-                      );
+                      shareContent(url!, subject: title);
                     },
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
-                    icon: Icons.bookmark,
+                    icon: Icons.share,
                     label: '공유',
                   ),
                   SlidableAction(
@@ -56,29 +54,47 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                   ),
                 ],
               ),
-
               child: Column(
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      if (url != null) {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => WebViewScreen(url: url)));
-                      }
+                  Builder(
+                    builder: (context) {
+                      return TextButton(
+                        onPressed: () {
+                          if (url != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => WebViewScreen(url: url)),
+                            );
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: theme.textTheme.bodyMedium?.color,
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: Text(
+                          title ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                            height: 1.0,
+                            color: theme.textTheme.bodyMedium?.color,
+                          ),
+                        ),
+                      );
                     },
-                    style: TextButton.styleFrom(foregroundColor: Colors.black, padding: EdgeInsets.zero),
-                    child: Text(
-                      title.toString(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, height: 1.0),
-                    ),
                   ),
-                  Divider(height: 1, color: Colors.grey),
+                  Divider(
+                    height: 1,
+                    color: theme.dividerColor,
+                  ),
                 ],
               ),
             );
           },
-        ),
+        ) : Center(child: Text("북마크한 데이터가 없습니다.")),
       ),
     );
   }

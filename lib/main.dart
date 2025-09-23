@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_news/theme/appTheme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'component/scaffold.dart';
 
@@ -15,8 +15,21 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void toggleTheme() {
+    setState(() {
+      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,15 +41,13 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: "flutterNews",
-          theme: ThemeData(
-            textTheme: Typography.englishLike2018.apply(
-              bodyColor: Colors.black,
-            ),
-          ),
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: _themeMode,
           home: child,
         );
       },
-      child: const ScaffoldComponent(),
+      child: ScaffoldComponent(toggleTheme: toggleTheme, themeMode: _themeMode),
     );
   }
 }

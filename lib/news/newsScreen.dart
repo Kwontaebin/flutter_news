@@ -43,26 +43,15 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   void initState() {
     super.initState();
-    fetchNews(
-      keyword: _selectedKeyword,
-      page: currentPage,
-      startDate: formatter.format(startDate),
-      endDate: formatter.format(endDate),
-    );
+    fetchNews(keyword: _selectedKeyword, page: currentPage, startDate: formatter.format(startDate), endDate: formatter.format(endDate));
 
     _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
       if (!isLoading && hasMore && currentKeyword.isNotEmpty) {
-        fetchNews(
-          keyword: currentKeyword,
-          page: currentPage,
-          startDate: formatter.format(startDate),
-          endDate: formatter.format(endDate),
-        );
+        fetchNews(keyword: currentKeyword, page: currentPage, startDate: formatter.format(startDate), endDate: formatter.format(endDate));
       }
     }
   }
@@ -108,9 +97,7 @@ class _NewsScreenState extends State<NewsScreen> {
         currentKeyword = keyword;
         currentPage = page + 1; // 다음 호출을 위해 page 증가
 
-        newsList.addAll(
-          articles.map((news) => {"title": news["title"], "url": news["url"]}),
-        );
+        newsList.addAll(articles.map((news) => {"title": news["title"], "url": news["url"]}));
 
         if (newsList.length >= totalResults || newsList.length >= 100) {
           hasMore = false;
@@ -230,20 +217,18 @@ class _NewsScreenState extends State<NewsScreen> {
             if (index < newsList.length) {
               final title = newsList[index]['title'];
               final url = newsList[index]['url'];
+              final theme = Theme.of(context);
 
               final bookmarkManager = BookmarkManager(boxName: 'newsBox');
               return Slidable(
                 key: ValueKey(index),
-        
+
                 endActionPane: ActionPane(
                   motion: const DrawerMotion(),
                   children: [
                     SlidableAction(
                       onPressed: (context) {
-                        shareContent(
-                          "공유",
-                          subject: url,
-                        );
+                        shareContent("공유", subject: url);
                       },
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
@@ -262,22 +247,16 @@ class _NewsScreenState extends State<NewsScreen> {
                     ),
                   ],
                 ),
-        
+
                 child: Column(
                   children: [
                     TextButton(
                       onPressed: () {
                         if (url != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => WebViewScreen(url: url)),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => WebViewScreen(url: url)));
                         }
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        padding: EdgeInsets.zero,
-                      ),
+                      style: TextButton.styleFrom(foregroundColor: theme.textTheme.bodyMedium?.color, padding: EdgeInsets.zero),
                       child: Text(
                         title,
                         maxLines: 1,
@@ -286,6 +265,7 @@ class _NewsScreenState extends State<NewsScreen> {
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                           height: 1.0,
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                       ),
                     ),
@@ -306,6 +286,8 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   void _showFilterSheet(BuildContext context) async {
+    final theme = Theme.of(context);
+
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -315,112 +297,129 @@ class _NewsScreenState extends State<NewsScreen> {
         minChildSize: 0.2,
         maxChildSize: 0.6,
         expand: false,
-        builder: (_, __) {
-          return StatefulBuilder(builder: (context, setState) {
-            return Container(
-              padding: EdgeInsets.all(16.r),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-              ),
-              child: Column(
-                spacing: 20.h,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 상단 바
-                  Center(
-                    child: Container(
-                      width: 40.w,
-                      height: 5.h,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  ),
-                  // 제목
-                  Text("필터 선택",
-                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
-
-                  // 검색어 입력 + 추가 버튼
-                  Row(
-                    spacing: 10.w,
+        builder: (_, scrollController) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return Container(
+                padding: EdgeInsets.all(16.r),
+                decoration: BoxDecoration(
+                  color: theme.dialogBackgroundColor,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+                ),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 20.h,
                     children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _plusTextController,
-                          decoration: const InputDecoration(
-                            hintText: '보고싶은 검색어를 입력하세요',
-                            border: OutlineInputBorder(),
+                      // 상단 바
+                      Center(
+                        child: Container(
+                          width: 40.w,
+                          height: 5.h,
+                          decoration: BoxDecoration(
+                            color: theme.dividerColor,
+                            borderRadius: BorderRadius.circular(10.r),
                           ),
                         ),
                       ),
-                      ElevatedButton(
-                        style: smallButton,
-                        child: const Text("추가", style: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          final text = _plusTextController.text.trim();
-                          if (text.isEmpty) return showToast(message: "검색어를 입력해주세요");
-                          if (plusShowKeyword.contains(text)) {
-                            showToast(message: "이미 추가된 키워드입니다");
-                          } else {
-                            setState(() => plusShowKeyword.add(text));
-                          }
-                          _plusTextController.clear();
-                          FocusScope.of(context).unfocus();
-                        },
+
+                      // 제목
+                      Text(
+                        "필터 선택",
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
 
+                      // 입력 + 버튼
+                      Row(
+                        spacing: 10.w,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _plusTextController,
+                              decoration: const InputDecoration(
+                                hintText: '보고싶은 검색어를 입력하세요',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: smallButton,
+                            child: Text(
+                              "추가",
+                              style: theme.textTheme.labelLarge?.copyWith(color: Colors.white),
+                            ),
+                            onPressed: () {
+                              final text = _plusTextController.text.trim();
+                              if (text.isEmpty) {
+                                return showToast(message: "검색어를 입력해주세요");
+                              }
+                              if (plusShowKeyword.contains(text)) {
+                                showToast(message: "이미 추가된 키워드입니다");
+                              } else {
+                                setState(() => plusShowKeyword.add(text));
+                              }
+                              _plusTextController.clear();
+                              FocusScope.of(context).unfocus();
+                            },
+                          ),
+                        ],
+                      ),
+
+                      // 필터칩
+                      Wrap(
+                        spacing: 10.w,
+                        runSpacing: 10.h,
+                        children: moreLabels.map((label) {
+                          final isSelected = plusShowKeyword.contains(label);
+                          return FilterChip(
+                            label: Text(label),
+                            selected: isSelected,
+                            selectedColor: Colors.blue,
+                            checkmarkColor: Colors.white,
+                            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                            onSelected: (_) => setState(() {
+                              isSelected
+                                  ? plusShowKeyword.remove(label)
+                                  : plusShowKeyword.add(label);
+                            }),
+                          );
+                        }).toList(),
+                      ),
+
+                      // 검색 버튼
+                      ElevatedButton(
+                        child: Text(
+                          "검색",
+                          style: theme.textTheme.labelLarge?.copyWith(color: Colors.white),
+                        ),
+                        onPressed: () async {
+                          if (plusShowKeyword.isEmpty) {
+                            return showToast(message: "키워드를 선택해주세요");
+                          }
+
+                          _selectedKeyword = "";
+
+                          await fetchNews(
+                            keyword: plusShowKeyword.join(" OR "),
+                            page: currentPage,
+                            startDate: formatter.format(startDate),
+                            endDate: formatter.format(endDate),
+                            reset: true,
+                          );
+
+                          Navigator.pop(context);
+                        },
+                      ),
                     ],
                   ),
-
-                  // 선택 가능한 라벨 필터칩
-                  Wrap(
-                    spacing: 10.w,
-                    runSpacing: 10.h,
-                    children: moreLabels.map((label) {
-                      final isSelected = plusShowKeyword.contains(label);
-                      return FilterChip(
-                        label: Text(label),
-                        selected: isSelected,
-                        selectedColor: Colors.blue,
-                        checkmarkColor: Colors.white,
-                        backgroundColor: Colors.grey[200],
-                        onSelected: (_) => setState(() {
-                          isSelected
-                              ? plusShowKeyword.remove(label)
-                              : plusShowKeyword.add(label);
-                        }),
-                      );
-                    }).toList(),
-                  ),
-
-                  // 검색 버튼
-                  ElevatedButton(
-                    child: const Text("검색"),
-                    onPressed: () async {
-                      if (plusShowKeyword.isEmpty) {
-                        return showToast(message: "키워드를 선택해주세요");
-                      }
-
-                      _selectedKeyword = "";
-
-                      await fetchNews(
-                        keyword: plusShowKeyword.join(" OR "),
-                        page: currentPage,
-                        startDate: formatter.format(startDate),
-                        endDate: formatter.format(endDate),
-                        reset: true, // 기존 뉴스 초기화
-                      );
-
-                      Navigator.pop(context);
-                    },
-                  ),
-
-                ],
-              ),
-            );
-          });
+                ),
+              );
+            },
+          );
         },
       ),
     );
