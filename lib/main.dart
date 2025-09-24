@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_news/provider/newsProvider.dart';
 import 'package:flutter_news/theme/appTheme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:provider/provider.dart';
 import 'component/scaffold.dart';
 
 Future<void> main() async {
@@ -12,7 +14,14 @@ Future<void> main() async {
   await Hive.openBox('newsBox');
 
   await dotenv.load(fileName: "/Users/kwonteabin/Documents/GitHub/flutter_news/.env");
-  runApp(const MyApp());
+  // runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => NewsProvider())],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
