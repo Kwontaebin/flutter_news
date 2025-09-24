@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../component/utils/bookmarkManager.dart';
 import '../component/utils/shareManager.dart';
-import '../component/utils/webViewScreen.dart';
+import '../component/utils/webView.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});

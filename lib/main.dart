@@ -12,8 +12,7 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('newsBox');
-
-  await dotenv.load(fileName: "/Users/kwonteabin/Documents/GitHub/flutter_news/.env");
+  await dotenv.load(fileName: ".env");
   // runApp(const MyApp());
 
   runApp(
@@ -48,7 +47,7 @@ class _MyAppState extends State<MyApp> {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
-          debugShowCheckedModeBanner: false,
+          debugShowCheckedModeBanner: true,
           title: "flutterNews",
           theme: lightTheme,
           darkTheme: darkTheme,

@@ -18,9 +18,7 @@ ThemeData lightTheme = ThemeData(
     unselectedItemColor: Colors.grey,
   ),
   // 글자 색상
-  textTheme: Typography.englishLike2018.apply(
-    bodyColor: Colors.black,
-  ),
+  textTheme: Typography.englishLike2018.apply(bodyColor: Colors.black),
 );
 
 ThemeData darkTheme = ThemeData(
@@ -38,7 +36,5 @@ ThemeData darkTheme = ThemeData(
     selectedItemColor: Colors.blue,
     unselectedItemColor: Colors.grey,
   ),
-  textTheme: Typography.englishLike2018.apply(
-    bodyColor: Colors.white,
-  ),
+  textTheme: Typography.englishLike2018.apply(bodyColor: Colors.white),
 );

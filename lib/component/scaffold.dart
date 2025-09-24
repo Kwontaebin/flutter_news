@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_news/bookmark/bookmarkScreen.dart';
 import 'package:flutter_news/news/newsScreen.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ScaffoldComponent extends StatefulWidget {
   final VoidCallback? toggleTheme; // 테마 토글 콜백
