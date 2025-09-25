@@ -318,8 +318,12 @@ class _NewsScreenState extends State<NewsScreen> {
                         runSpacing: 10.h,
                         children: moreLabels.map((label) {
                           final isSelected = plusShowKeyword.contains(label);
+                          final textColor = isSelected
+                              ? Colors.white
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black);
+
                           return FilterChip(
-                            label: Text(label),
+                            label: Text(label, style: TextStyle(color: textColor)),
                             selected: isSelected,
                             selectedColor: Colors.blue,
                             checkmarkColor: Colors.white,
