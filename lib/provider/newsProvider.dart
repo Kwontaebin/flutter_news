@@ -14,7 +14,7 @@ class NewsProvider extends ChangeNotifier {
   late final newsApiKey = dotenv.env['NEWS_API_KEY'];
   String selectedKeyword = "경제";
 
-  Future<void> fetchNews({required String keyword, required String startDate, required String endDate, bool reset = false}) async {
+  Future<void> fetchNews({required String keyword, required String startDate, bool reset = false}) async {
     if (!reset && (isLoading || !hasMore)) return;
 
     isLoading = true;
@@ -39,7 +39,7 @@ class NewsProvider extends ChangeNotifier {
           'page': currentPage,
           'pageSize': 20,
           'from': startDate,
-          'to': endDate,
+          'to': DateTime.now(),
           'apiKey': newsApiKey,
         },
       );

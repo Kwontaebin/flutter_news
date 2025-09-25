@@ -22,12 +22,15 @@ class _NewsScreenState extends State<NewsScreen> {
   final ScrollController _scrollController = ScrollController();
   final formatter = DateFormat('yyyy-MM-dd');
   final endDate = DateTime.now();
-  late final DateTime startDate = DateTime.now().subtract(const Duration(days: 7));
+  late DateTime startDate = endDate.subtract(Duration(days: 3));
   String _selectedKeyword = "경제";
   final List<String> labels = ['경제', '엔터', '스포츠', '여행', 'IT', '지식', '건강', '음식'];
   late final List<String> moreLabels = [...labels, '패션', '음악', '영화', '쇼핑'];
   List<String> plusShowKeyword = [];
   late final NewsProvider provider;
+
+  late String _selectedDateRange = "선택"; // 기본값
+  final List<String> _dateRanges = ["선택", "전체", "1달", "2주", "1주"];
 
   final smallButton = ElevatedButton.styleFrom(
     backgroundColor: Colors.blue,
@@ -42,23 +45,13 @@ class _NewsScreenState extends State<NewsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider = context.read<NewsProvider>();
 
-      provider.fetchNews(
-        keyword: _selectedKeyword,
-        startDate: formatter.format(startDate),
-        endDate: formatter.format(endDate),
-        reset: true,
-      );
+      provider.fetchNews(keyword: _selectedKeyword, startDate: formatter.format(startDate), reset: true);
     });
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 && !provider.isLoading && provider.hasMore) {
-      provider.fetchNews(
-        keyword: _selectedKeyword,
-        startDate: formatter.format(startDate),
-        endDate: formatter.format(endDate),
-        reset: false,
-      );
+      provider.fetchNews(keyword: _selectedKeyword, startDate: _selectedDateRange == "전체" ? "" : formatter.format(startDate), reset: false);
     }
   }
 
@@ -89,12 +82,10 @@ class _NewsScreenState extends State<NewsScreen> {
               return;
             }
 
-            await context.read<NewsProvider>().fetchNews(
-              keyword: _selectedKeyword,
-              startDate: formatter.format(startDate),
-              endDate: formatter.format(endDate),
-              reset: true,
-            );
+            _selectedDateRange = "선택";
+            startDate = endDate.subtract(Duration(days: 3));
+
+            await context.read<NewsProvider>().fetchNews(keyword: _selectedKeyword, startDate: formatter.format(startDate), reset: true);
             _searchTextController.clear();
             FocusScope.of(context).unfocus();
           },
@@ -121,13 +112,12 @@ class _NewsScreenState extends State<NewsScreen> {
                   onTap: () async {
                     _searchTextController.clear();
                     FocusScope.of(context).unfocus();
-                    setState(() => _selectedKeyword = label);
-                    await context.read<NewsProvider>().fetchNews(
-                      keyword: label,
-                      startDate: formatter.format(startDate),
-                      endDate: formatter.format(endDate),
-                      reset: true,
-                    );
+                    setState(() {
+                      _selectedKeyword = label;
+                      _selectedDateRange = "선택";
+                      startDate = endDate.subtract(Duration(days: 3));
+                    });
+                    await context.read<NewsProvider>().fetchNews(keyword: label, startDate: formatter.format(startDate), reset: true);
                   },
                   child: Container(
                     width: 50.w,
@@ -285,6 +275,46 @@ class _NewsScreenState extends State<NewsScreen> {
                         "필터 선택",
                         style: theme.textTheme.titleLarge?.copyWith(fontSize: 20.sp, fontWeight: FontWeight.bold),
                       ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: DropdownButton<String>(
+                          value: _selectedDateRange,
+                          underline: SizedBox(),
+                          items: _dateRanges.map((range) {
+                            return DropdownMenuItem<String>(value: range, child: Text(range));
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedDateRange = value;
+
+                                switch (_selectedDateRange) {
+                                  case "선택":
+                                    startDate = endDate.subtract(Duration(days: 3));
+                                    break;
+                                  case "1주":
+                                    startDate = endDate.subtract(Duration(days: 7));
+                                    break;
+                                  case "2주":
+                                    startDate = endDate.subtract(Duration(days: 14));
+                                    break;
+                                  case "1달":
+                                    startDate = DateTime(endDate.year, endDate.month - 1, endDate.day);
+                                    break;
+                                  case "전체":
+                                  default:
+                                    startDate = DateTime(DateTime.now().year - 1, DateTime.now().month, DateTime.now().day);
+                                    break;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
                       Row(
                         spacing: 10.w,
                         children: [
@@ -345,8 +375,7 @@ class _NewsScreenState extends State<NewsScreen> {
 
                           await context.read<NewsProvider>().fetchNews(
                             keyword: _selectedKeyword,
-                            startDate: formatter.format(startDate),
-                            endDate: formatter.format(endDate),
+                            startDate: _selectedDateRange == "전체" ? "" : formatter.format(startDate),
                             reset: true,
                           );
 
