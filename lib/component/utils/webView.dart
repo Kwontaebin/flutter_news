@@ -12,7 +12,7 @@ class WebViewScreen extends StatefulWidget {
 
 class _WebViewScreenState extends State<WebViewScreen> {
   late final WebViewController _controller;
-  bool _isLoading = true; // 로딩 상태
+  double _progress = 0; // 로딩 진행률 (0.0 ~ 1.0)
 
   @override
   void initState() {
@@ -21,9 +21,18 @@ class _WebViewScreenState extends State<WebViewScreen> {
     _controller = WebViewController()
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (url) {
-            // 웹뷰 화면이 나타나는 순간 바로 로딩 제거
-            setState(() => _isLoading = false);
+          onProgress: (progress) {
+            if (!mounted) return; // State가 트리에 없으면 무시
+            setState(() {
+              _progress = progress / 100;
+            });
+          },
+
+          onPageFinished: (url) {
+            if (!mounted) return;
+            setState(() {
+              _progress = 1;
+            });
           },
         ),
       )
@@ -35,20 +44,18 @@ class _WebViewScreenState extends State<WebViewScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("뉴스 페이지", style: TextStyle(color: Colors.black)),
+        title: const Text("뉴스 페이지", style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3.0),
+          child: _progress < 1.0
+              ? LinearProgressIndicator(value: _progress, backgroundColor: Colors.grey[200], color: Colors.blue, minHeight: 3)
+              : const SizedBox.shrink(), // 완료되면 숨김
+        ),
       ),
-      body: Stack(
-        children: [
-          WebViewWidget(controller: _controller),
-          if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(), // 로딩바
-            ),
-        ],
-      ),
+      body: WebViewWidget(controller: _controller),
     );
   }
 }

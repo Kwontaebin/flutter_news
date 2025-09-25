@@ -49,11 +49,12 @@ class NewsProvider extends ChangeNotifier {
       newsList.addAll(articles.map((json) => News.fromJson({"title": json["title"], "url": json["url"]})));
 
       currentPage++;
+
       if (newsList.length >= totalResults || newsList.length >= 100) {
         hasMore = false;
       }
     } catch (e) {
-      print("Error: $e");
+      print("공습경보: $e");
       showToast(message: "에러가 발생했습니다.\n잠시 후 다시 시도해 주세요");
     } finally {
       isLoading = false;
